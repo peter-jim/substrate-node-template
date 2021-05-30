@@ -47,6 +47,7 @@ sp-version = {default-features = false, version = '3.0.0', git = 'https://github
 
 # local dependencies
 pallet-template = {default-features = false, version = '3.0.0', path = '../pallets/template'}
+pallet-token = {default-features = false, version = '3.0.0', path = '../pallets/token'}
 
 [features]
 default = ['std']
@@ -67,6 +68,7 @@ std = [
 	'frame-support/std',
 	'frame-system-rpc-runtime-api/std',
 	'frame-system/std',
+	'pallet-token/std',
 	'pallet-aura/std',
 	'pallet-balances/std',
 	'pallet-grandpa/std',
