@@ -11,7 +11,7 @@ pub mod pallet {
 	use frame_system::{pallet_prelude::*,ensure_signed};
 	//use sp_runtime::traits::*;
 	use sp_std::vec::Vec;
-	use sp_runtime::traits::{CheckedAdd::checked_add,CheckedSub::checked_sub};
+	use sp_runtime::traits::*;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
