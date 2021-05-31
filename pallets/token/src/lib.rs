@@ -108,7 +108,7 @@ pub mod pallet {
 
 			<Balances<T>>::insert(sender, 2100000);
 
-			Init::put(true);
+			//is_init::put(true);
 
 			Ok(())
 		}
