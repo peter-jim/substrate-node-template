@@ -82,7 +82,7 @@ pub mod pallet {
 			let sender = ensure_signed(_origin)?;
 			let sender_balance = Self::get_balance(&sender);
 			let receiver_balance = Self::get_balance(&to);
-			let updated_from_balance = sender_balance.unwrap().checked_sub(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			let updated_from_balance = sender_balance.unwrap().checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
 			
 			let updated_to_balance = receiver_balance.unwrap().checked_sub(value).expect("Entire supply fits in u64; qed");
 			// Calculate new balances
@@ -104,7 +104,7 @@ pub mod pallet {
 			let sender = ensure_signed(origin)?;
 			//ensure!(!Self::is_init().unwrap()  , Error::<T>::AlreadyInitialized);
 
-			<Balances<T>>::insert(sender, 211);
+			<Balances<T>>::insert(sender, 210000000);
 
 			//is_init::put(true);
 
