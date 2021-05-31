@@ -9,6 +9,7 @@ pub use pallet::*;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	//use sp_runtime::traits::*;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -30,9 +31,19 @@ pub mod pallet {
 	pub type Something<T> = StorageValue<_, u32>;
 	
 	 #[pallet::storage] 
-    pub(super) type Token<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;   
+    pub(super) type Token<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;  
 
-	
+	#[pallet::type_value]
+	pub(super) fn TotalSupply<T: Config>() -> u64 { 21000000 }
+	#[pallet::storage]
+	#[pallet::getter(fn is_init)]
+	pub(super) type Init<T:Config> = StorageValue<_,bool>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn get_balance)]
+	pub(super) type Balances<T:Config> = StorageMap<_,Blake2_128Concat,T::AccountId,u64>;
+
+
 	// Pallets use events to inform users when important changes are made.
 	// https://substrate.dev/docs/en/knowledgebase/runtime/events
 	#[pallet::event]
@@ -41,16 +52,19 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
-		SomethingStored(u32, T::AccountId),
+		/// Token was initialized by user
+        Initialized(T::AccountId),
+        /// Tokens successfully transferred between users
+        Transfer(T::AccountId, T::AccountId, u64), // (from, to, value)
 	}
 
 	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-		/// Error names should be descriptive.
-		NoneValue,
-		/// Errors should have helpful documentation associated with them.
-		StorageOverflow,
+		/// Attempted to initialize the token after it had already been initialized.
+        AlreadyInitialized,
+        /// Attempted to transfer more funds than were available
+        InsufficientFunds,
 	}
 
 	#[pallet::hooks]
@@ -64,38 +78,39 @@ pub mod pallet {
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+		pub fn transfer(_origin: OriginFor<T>, to: T::AccountId, value: u64) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://substrate.dev/docs/en/knowledgebase/runtime/origin
-			let who = ensure_signed(origin)?;
+			let sender = ensure_signed(_origin)?;
+			let sender_balance = Self::get_balance(&sender);
+			let receiver_balance = Self::get_balance(&to);
 
-			// Update storage.
-			<Something<T>>::put(something);
+			// Calculate new balances
+			//let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			//let updated_to_balance = receiver_balance.checjed_sub(value).expect("Entire supply fits in u64; qed");
 
-			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, who));
-			// Return a successful DispatchResultWithPostInfo
+			// Write new balances to storage
+			<Balances<T>>::insert(&sender, 2222);
+			<Balances<T>>::insert(&to, 2100);
+
+			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
+			
+
 			Ok(())
 		}
 
-		/// An example dispatchable that may throw a custom error.
+		/// An example init
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
-			let _who = ensure_signed(origin)?;
+		pub fn init(origin: OriginFor<T>) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+			ensure!(Self::is_init(), Error::<T>::AlreadyInitialized);
 
-			// Read a value from storage.
-			match <Something<T>>::get() {
-				// Return an error if the value has not been set.
-				None => Err(Error::<T>::NoneValue)?,
-				Some(old) => {
-					// Increment the value read from storage; will error in the event of overflow.
-					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-					// Update the value in storage with the incremented result.
-					<Something<T>>::put(new);
-					Ok(())
-				},
-			}
+			<Balances<T>>::insert(sender, 2100000);
+
+			Init::put(true);
+
+			Ok(())
 		}
 
 
