@@ -104,7 +104,7 @@ pub mod pallet {
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn init(origin: OriginFor<T>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
-			ensure!(Self::is_init(), Error::<T>::AlreadyInitialized);
+			//ensure!(Self::is_init() != , Error::<T>::AlreadyInitialized);
 
 			<Balances<T>>::insert(sender, 2100000);
 
