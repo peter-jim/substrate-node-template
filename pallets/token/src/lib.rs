@@ -7,11 +7,9 @@
 pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*,ensure };
+	use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*,ensure };
 	use frame_system::{pallet_prelude::*,ensure_signed};
-	//use sp_runtime::traits::*;
-	use sp_std::vec::Vec;
-	use sp_runtime::traits::*;
+	
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -77,38 +75,40 @@ pub mod pallet {
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn transfer(_origin: OriginFor<T>, to: T::AccountId, value: u64) -> DispatchResult {
+		pub fn transfer(_origin: OriginFor<T>, to: T::AccountId, value: u64) -> DispatchResultWithPostInfo {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://substrate.dev/docs/en/knowledgebase/runtime/origin
 			let sender = ensure_signed(_origin)?;
 			let sender_balance = Self::get_balance(&sender);
 			let receiver_balance = Self::get_balance(&to);
-
+			let updated_from_balance = sender_balance.unwrap().checked_sub(value);
+			
+			let updated_to_balance = receiver_balance.unwrap().checked_sub(value);
 			// Calculate new balances
-			let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
-			let updated_to_balance = receiver_balance.checked_sub(value).expect("Entire supply fits in u64; qed");
+			//let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			//let updated_to_balance = receiver_balance.checked_sub(value).expect("Entire supply fits in u64; qed");
 			// Write new balances to storage
-			<Balances<T>>::insert(&sender, updated_from_balance);
-			<Balances<T>>::insert(&to, updated_to_balance);
+			<Balances<T>>::insert(&sender, updated_from_balance.unwrap());
+			<Balances<T>>::insert(&to, updated_to_balance.unwrap());
 			
 			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
 			
 
-			Ok(())
+			Ok(().into())
 		}
 
 		/// An example init
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn init(origin: OriginFor<T>) -> DispatchResult {
+		pub fn init(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
 			let sender = ensure_signed(origin)?;
-			ensure!(!Self::is_init()  , Error::<T>::AlreadyInitialized);
+			ensure!(!Self::is_init().unwrap()  , Error::<T>::AlreadyInitialized);
 
-			<Balances<T>>::insert(sender, TotalSupply);
+			<Balances<T>>::insert(sender, 211);
 
 			//is_init::put(true);
 
-			Ok(())
+			Ok(().into())
 		}
 
 
