@@ -7,9 +7,11 @@
 pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
-	use frame_system::pallet_prelude::*;
+	use frame_support::{dispatch::DispatchResult, pallet_prelude::*,ensure };
+	use frame_system::{pallet_prelude::*,ensure_signed};
 	//use sp_runtime::traits::*;
+	use sp_std::vec::Vec;
+	use sp_runtime::traits::*;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -84,13 +86,12 @@ pub mod pallet {
 			let receiver_balance = Self::get_balance(&to);
 
 			// Calculate new balances
-			//let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
-			//let updated_to_balance = receiver_balance.checjed_sub(value).expect("Entire supply fits in u64; qed");
-
+			let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			let updated_to_balance = receiver_balance.checked_sub(value).expect("Entire supply fits in u64; qed");
 			// Write new balances to storage
-			<Balances<T>>::insert(&sender, 2222);
-			<Balances<T>>::insert(&to, 2100);
-
+			<Balances<T>>::insert(&sender, updated_from_balance);
+			<Balances<T>>::insert(&to, updated_to_balance);
+			a
 			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
 			
 
@@ -101,9 +102,9 @@ pub mod pallet {
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn init(origin: OriginFor<T>) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
-			//ensure!(Self::is_init() != , Error::<T>::AlreadyInitialized);
+			ensure!(!Self::is_init()  , Error::<T>::AlreadyInitialized);
 
-			<Balances<T>>::insert(sender, 2100000);
+			<Balances<T>>::insert(sender, TotalSupply);
 
 			//is_init::put(true);
 
