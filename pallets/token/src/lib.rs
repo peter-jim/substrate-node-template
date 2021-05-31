@@ -30,9 +30,6 @@ pub mod pallet {
 	// https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
 	pub type Something<T> = StorageValue<_, u32>;
 	
-	 #[pallet::storage] 
-    pub(super) type Token<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;  
-
 	#[pallet::type_value]
 	pub(super) fn TotalSupply<T: Config>() -> u64 { 21000000 }
 	#[pallet::storage]
