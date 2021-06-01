@@ -7,7 +7,7 @@
 pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*,ensure };
+	use frame_support::{dispatch::DispatchResult, pallet_prelude::*,ensure };
 	use frame_system::{pallet_prelude::*,ensure_signed};
 	
 
@@ -75,7 +75,7 @@ pub mod pallet {
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn transfer(_origin: OriginFor<T>, to: T::AccountId, value: u64) -> DispatchResultWithPostInfo {
+		pub fn transfer(_origin: OriginFor<T>, to: T::AccountId, value: u64) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://substrate.dev/docs/en/knowledgebase/runtime/origin
@@ -95,20 +95,20 @@ pub mod pallet {
 			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
 			
 
-			Ok(().into())
+			Ok(())
 		}
 
 		/// An example init
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn init(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+		pub fn init(origin: OriginFor<T>) ->  DispatchResult{
 			let sender = ensure_signed(origin)?;
-			//ensure!(!Self::is_init().unwrap()  , Error::<T>::AlreadyInitialized);
+			ensure!(!Self::is_init().unwrap()  , Error::<T>::AlreadyInitialized);
 
 			<Balances<T>>::insert(sender, 210000000);
 
 			//is_init::put(true);
 
-			Ok(().into())
+			Ok(())
 		}
 
 
