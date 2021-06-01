@@ -32,6 +32,7 @@ pub mod pallet {
 	
 	#[pallet::type_value]
 	pub(super) fn TotalSupply<T: Config>() -> u64 { 21000000 }
+
 	#[pallet::storage]
 	#[pallet::getter(fn is_init)]
 	pub(super) type Init<T:Config> = StorageValue<_,bool>;
@@ -89,8 +90,10 @@ pub mod pallet {
 			//let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
 			//let updated_to_balance = receiver_balance.checked_sub(value).expect("Entire supply fits in u64; qed");
 			// Write new balances to storage
-			<Balances<T>>::insert(&sender, updated_from_balance);
-			<Balances<T>>::insert(&to, updated_to_balance);
+			//<Balances<T>>::insert(&sender, updated_from_balance);
+			//<Balances<T>>::insert(&to, updated_to_balance);
+			Balances::<T>::insert(&sender, updated_from_balance);
+			Balances::<T>::insert(&to, updated_to_balance);
 			
 			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
 			
@@ -104,7 +107,7 @@ pub mod pallet {
 			let sender = ensure_signed(origin)?;
 			ensure!(Self::is_init() == None , Error::<T>::AlreadyInitialized);
 
-			<Balances<T>>::insert(sender, 210000000);
+			<Balances<T>>::insert(sender, TotalSupply::<T>::get());
 
 			Init::<T>::put(true);
 
