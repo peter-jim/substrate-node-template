@@ -84,7 +84,7 @@ pub mod pallet {
 			let sender_balance:u64 = Balances::<T>::get(&sender).unwrap();
 			let receiver_balance:u64 = Balances::<T>::get(&to).unwrap();
 
-			let updated_from_balance = sender_balance.checked_sub(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			let updated_from_balance:u64 = sender_balance.checked_sub(value).ok_or(<Error<T>>::InsufficientFunds)?;
 			let updated_to_balance:u64 = receiver_balance.checked_add(value).expect("Entire supply fits in u64; qed");
 			// Write new balances to storage
 			//<Balances<T>>::insert(&sender, updated_from_balance);
