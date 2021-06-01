@@ -7,7 +7,7 @@
 pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*,ensure };
+	use frame_support::{dispatch::DispatchResult, pallet_prelude::*,ensure ,debug};
 	use frame_system::{pallet_prelude::*,ensure_signed};
 	
 
@@ -83,17 +83,17 @@ pub mod pallet {
 			let sender = ensure_signed(_origin)?;
 			let sender_balance = Self::get_balance(&sender);
 			let receiver_balance = Self::get_balance(&to);
-			let updated_from_balance = sender_balance.unwrap().checked_sub(value).ok_or(<Error<T>>::InsufficientFunds)?;
+			//let updated_from_balance = sender_balance.unwrap().checked_sub(value).ok_or(<Error<T>>::InsufficientFunds)?;
 			
-			let updated_to_balance = receiver_balance.unwrap().checked_add(value).expect("Entire supply fits in u64; qed");
+			///let updated_to_balance = receiver_balance.unwrap().checked_add(value).expect("Entire supply fits in u64; qed");
 			// Calculate new balances
 			//let updated_from_balance = sender_balance.checked_add(value).ok_or(<Error<T>>::InsufficientFunds)?;
 			//let updated_to_balance = receiver_balance.checked_sub(value).expect("Entire supply fits in u64; qed");
 			// Write new balances to storage
 			//<Balances<T>>::insert(&sender, updated_from_balance);
 			//<Balances<T>>::insert(&to, updated_to_balance);
-			Balances::<T>::insert(&sender, updated_from_balance);
-			Balances::<T>::insert(&to, updated_to_balance);
+			Balances::<T>::insert(&sender, 2131);
+			Balances::<T>::insert(&to, 3244);
 			
 			//Self::deposit_event(RawEvent::Transfer(sender, to, value));
 			
